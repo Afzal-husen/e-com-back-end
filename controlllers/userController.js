@@ -46,10 +46,11 @@ export const logout = async (req, res, next) => {
       expiration: Date.now(),
       httpOnly: true
     }
-    res.status(200).cookie("token", null, option).json({
-      success: true,
-      message: "user Logged out"
-    })
+    // res.status(200).cookie("token", null, option).json({
+    //   success: true,
+    //   message: "user Logged out"
+    // })
+    res.clearCookie()
   } catch (error) {
     next(error);
   }
