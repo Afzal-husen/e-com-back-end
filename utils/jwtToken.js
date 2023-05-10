@@ -1,4 +1,4 @@
-export const send_token_as_cookie = (user, statusCode, res) => {
+export const send_token_as_cookie = (user, statusCode, res, message) => {
   //create token
   const token = user.createJwtToken();
   //send token as cookie, along wtih expiration and cookie security
@@ -9,6 +9,6 @@ export const send_token_as_cookie = (user, statusCode, res) => {
   res.status(statusCode).cookie("access_token", token, options).json({
     success: true,
     user,
-    token
+    message: message
   });
 };

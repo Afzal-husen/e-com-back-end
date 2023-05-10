@@ -8,9 +8,9 @@ const errors = (err, req, res, next) => {
 
   //mongoose duplicate key error
   if (err.code === 11000) {
-    const message = `Duplicate ${Object.keys(err.keyValue)} ${Object.values(
+    const message = `user with ${Object.keys(err.keyValue)} ${Object.values(
       err.keyValue,
-    )} detected`;
+    )} already exists`;
     err = new ErrorHandler(message, 400);
   }
   //wrong jwt error
