@@ -45,9 +45,11 @@ export const signIn = async (req, res, next) => {
       );
     }
 
+    const signedUser = await User.findById(user._id).select("-password");
+
     const message = "Login Successful";
 
-    send_token_as_cookie(user, 200, res, message);
+    send_token_as_cookie(signedUser, 200, res, message);
   } catch (error) {
     next(error);
   }
@@ -55,11 +57,15 @@ export const signIn = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    const option = {
-      expiration: Date.now(),
-      httpOnly: true,
-    };
-    res.status(200).cookie("token", null, option).json({
+    // const option = {
+    //   expiration: Date.now(),
+    //   httpOnly: true,
+    // };
+    // res.status(200).cookie("token", null, option).json({
+    //   success: true,
+    //   message: "user Logged out",
+    // });
+    res.clearCookie("token").json({
       success: true,
       message: "user Logged out",
     });
@@ -79,13 +85,15 @@ export const forgetPassword = async (req, res, next) => {
     const resetToken = user.createResetToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${req.protocol}://${req.get(
-      "host",
-    )}/password/reset/${resetToken}`;
-    const message = `click on ${resetUrl} to recover your password`;
+    // const resetUrl = `${req.protocol}://${req.get(
+    //   "host",
+    // )}/password/reset/${resetToken}`;
+    
+    // const message = `click on ${resetUrl} to recover your password`;
+    const message = "Your verification token is:";
 
     try {
-      sendEmail(email, "Password recovery", message);
+      sendEmail(email, "Password recovery", message, resetToken);
 
       res.status(200).json({
         success: true,
@@ -111,13 +119,13 @@ export const resetPassword = async (req, res, next) => {
 
     const { token } = req.params;
 
-    const resetPasswordToken = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    // const resetPasswordToken = crypto
+    //   .createHash("sha256")
+    //   .update(token)
+    //   .digest("hex");
 
     const user = await User.findOne({
-      resetPasswordToken: resetPasswordToken,
+      resetPasswordToken: token,
       resetTimeLimit: { $gt: Date.now() },
     }).select("+password");
 
@@ -144,6 +152,34 @@ export const resetPassword = async (req, res, next) => {
     send_token_as_cookie(user, 200, res, message);
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+};
+
+// confirm tokem
+
+export const confirmResetToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    if (!token) return next(new ErrorHandler("please provide the token", 400));
+
+    const resetToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: resetToken,
+      resetTimeLimit: { $gt: Date.now() },
+    });
+
+    if (!user) return next(new ErrorHandler("invalid token", 401));
+
+    const message = "Token is verified";
+
+    res.status(200).json({
+      success: true,
+      message,
+      resetToken
+    });
+  } catch (error) {
     next(error);
   }
 };

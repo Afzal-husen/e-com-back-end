@@ -78,7 +78,7 @@ userSchema.methods.comparePassword = async function(password) {
 //set the reset pasword token to
 
 userSchema.methods.createResetToken = function () {
-  const resetToken = crypto.randomBytes(20).toString("hex");
+  const resetToken = crypto.randomBytes(4).toString("hex");
   this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
@@ -86,7 +86,6 @@ userSchema.methods.createResetToken = function () {
   const date = Date.now() + 15 * 60 * 1000;
   this.resetTimeLimit = date;
 
-  console.log(resetToken)
   return resetToken
 };
 
