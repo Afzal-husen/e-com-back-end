@@ -4,7 +4,6 @@ import productRouter from "./routes/productRoutes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import errors from "./middleware/error.js";
-import cloudinary from "cloudinary"
 
 export const app = express();
 
@@ -41,9 +40,3 @@ app.use("/api/v1/products", productRouter);
 //error middleware
 app.use(errors);
 
-// cloudinary config
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});

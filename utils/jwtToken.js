@@ -5,7 +5,7 @@ export const send_token_as_cookie = (user, statusCode, res, message) => {
   const options = {
     maxAge:  30 * 60 * 1000,
     httpOnly: false,
-    secure: true
+    // secure: true
   };
   res.status(statusCode).cookie("token", token, options).json({
     success: true,

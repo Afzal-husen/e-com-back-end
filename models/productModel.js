@@ -35,7 +35,7 @@ const ProductSchema = new mongoose.Schema({
       },
       url: {
         type: String,
-        required: true,
+        required: true
       },
     },
   ],

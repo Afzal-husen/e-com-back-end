@@ -1,11 +1,14 @@
 import cloudinary from "cloudinary";
 import Product from "../models/productModel.js";
+import { ErrorHandler } from "../utils/errorHandler.js";
 
 export const newProduct = async (req, res, next) => {
   try {
+    const reviews = req.body.reviews[0]
+
     let images = [];
 
-    if (typeof req.body.images === "String") {
+    if (typeof req.body.images === "string") {
       images.push(req.body.images);
     } else {
       images = req.body.images;
@@ -25,22 +28,34 @@ export const newProduct = async (req, res, next) => {
     }
 
     req.body.images = imagesLinks;
-    req.body.user = req.user.id;
+    reviews.user = req.user.id;
 
     const product = await Product.create(req.body);
     product.save();
 
-    // res.status(200).json({
-    //   success: true,
-    //   product,
-    // });
-    res.send("product created")
+    res.status(200).json({
+      success: true,
+      product,
+    });
+
   } catch (error) {
-      console.log(error.message)
-    next(error.message);
+    console.log("an error has occured")
+    console.log(error)
+    next(error);
   }
 };
 
-export const getAllProducts = (req, res, next) => {
-  res.send("All The Products");
+export const getAllProducts = async (req, res, next) => {
+  try {
+    const products = await Product.find({});
+    if (!products)
+      return next(new ErrorHandler("No Product available for display", 404));
+
+    res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
