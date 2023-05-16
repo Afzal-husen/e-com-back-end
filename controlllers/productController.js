@@ -1,10 +1,12 @@
 import cloudinary from "cloudinary";
 import Product from "../models/productModel.js";
 import { ErrorHandler } from "../utils/errorHandler.js";
+import productModel from "../models/productModel.js";
 
+// create a product
 export const newProduct = async (req, res, next) => {
   try {
-    const reviews = req.body.reviews[0]
+    const reviews = req.body.reviews[0];
 
     let images = [];
 
@@ -37,14 +39,14 @@ export const newProduct = async (req, res, next) => {
       success: true,
       product,
     });
-
   } catch (error) {
-    console.log("an error has occured")
-    console.log(error)
+    console.log("an error has occured");
+    console.log(error);
     next(error);
   }
 };
 
+// get all products
 export const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.find({});
@@ -55,6 +57,24 @@ export const getAllProducts = async (req, res, next) => {
       success: true,
       products,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// get single product
+export const getProduct = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const product = await productModel.findById(id);
+
+    if (!product) return next(new ErrorHandler("No product found", 404));
+
+    res.status(200).json({
+      success: true,
+      product
+    })
+
   } catch (error) {
     next(error);
   }
